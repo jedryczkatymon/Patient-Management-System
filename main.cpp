@@ -21,12 +21,19 @@ public:
     string allergies[20];
 };
 
-Patient addPatient(Patient *patientArray)
+void addPatient(Patient *&patientArray, int &size)
 {
-    int numOfPatientsEntr = 0;
+    int numOfPatientsEntr;
     cout << "How many patients do you want do enter? ";
     cin >> numOfPatientsEntr;
-    for (int i = 0; i < numOfPatientsEntr; i++)
+    Patient *patientArrayTemp = new Patient[size + numOfPatientsEntr];
+
+    for (int i = 0; i < size; ++i)
+    {
+        patientArrayTemp[i] = patientArray[i];
+    }
+
+    for (int i = size; i < size + numOfPatientsEntr; ++i)
     {
         cout << "Enter first name: ";
         cin >> patientArray[i].name;
@@ -91,12 +98,42 @@ Patient addPatient(Patient *patientArray)
         cout << "The patient data was entered successfully!" << endl;
     }
     numOfPatientsEntr--;
-    return *patientArray;
+    delete[] patientArray;
+    patientArray = patientArrayTemp;
+    size += numOfPatientsEntr;
+}
+
+void deletePatient(Patient *&patientArray, int &size)
+{
+    int index;
+    cout << "Enter the index of the patient you want to delete: ";
+    cin >> index;
+
+    if (index < 0 || index >= size)
+    {
+        cout << "Invalid index.\n";
+        return;
+    }
+
+    for (int i = index; i < size - 1; ++i)
+    {
+        patientArray[i] = patientArray[i + 1];
+    }
+
+    Patient *patientArrayTemp = new Patient[size - 1];
+    for (int i = 0; i < size - 1; ++i)
+    {
+        patientArrayTemp[i] = patientArray[i];
+    }
+    delete[] patientArray;
+    patientArray = patientArrayTemp;
+    --size;
 }
 
 int main()
 {
-    Patient *patientArray = new Patient[50];
+    Patient *patientArray = NULL;
+    int size = 0;
     int choice;
     do
     {
@@ -108,11 +145,10 @@ int main()
         switch (choice)
         {
         case 1:
-            addPatient(patientArray);
+            addPatient(patientArray, size);
             break;
         default:
             cout << "Invalid code\n";
         }
     } while (choice != 8);
-    
 }
