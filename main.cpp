@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 using namespace std;
 
@@ -101,6 +102,7 @@ void addPatient(Patient *&patientArray, int &size)
     delete[] patientArray;
     patientArray = patientArrayTemp;
     size += numOfPatientsEntr;
+    savePatient(patientArray, size);
 }
 
 void deletePatient(Patient *&patientArray, int &size)
@@ -128,6 +130,54 @@ void deletePatient(Patient *&patientArray, int &size)
     delete[] patientArray;
     patientArray = patientArrayTemp;
     --size;
+    cout << "The patient data was deleted successfully!\n";
+    savePatient(patientArray, size);
+}
+
+void savePatient(Patient *&patientArray, int &size)
+{
+    if (patientArray == NULL || size == 0)
+    {
+        cout << "No data to save.\n";
+        return;
+    }
+
+    fstream file("patientDataBase.csv", ios::app | ios::in);
+    if (!file)
+    {
+        cout << "Can't find the save file.\n";
+        return;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        file << patientArray[i].name << ','
+        << patientArray[i].middleName << ','
+        << patientArray[i].surname << ','
+        << patientArray[i].motherMaidenName << ','
+        << patientArray[i].phoneNumber << ','
+        << patientArray[i].dayOfBirth << ','
+        << patientArray[i].monthOfBirth << ','
+        << patientArray[i].yearOfBirth << ','
+        << patientArray[i].cityOfBirth << ','
+        << patientArray[i].socialSecurityNumber << ','
+        << patientArray[i].insuranceNumber << ',';
+        for (int j = 0; j < 20; j++)
+        {
+            file << patientArray[i].medicalRecord[j] << ',';
+        }
+        for (int j = 0; j < 20; j++)
+        {
+            file << patientArray[i].currentMedications[j] << ',';
+        }
+        for (int j = 0; j < 20; j++)
+        {
+            file << patientArray[i].allergies[j] << ',';
+        }
+        file << '\n';
+    }
+
+    cout << "The patient data was saved successfully!\n";
 }
 
 int main()
@@ -139,6 +189,7 @@ int main()
     {
         cout << "\nPatient Management System:\n";
         cout << "1. Add patient\n";
+        cout << "2. Delete patient\n";
         cout << "What do you want to do? (pick a number corresponding to a function): ";
         cin >> choice;
 
@@ -146,6 +197,9 @@ int main()
         {
         case 1:
             addPatient(patientArray, size);
+            break;
+        case 2:
+            deletePatient(patientArray, size);
             break;
         default:
             cout << "Invalid code\n";
