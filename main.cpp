@@ -3,9 +3,8 @@
 #include <string>
 using namespace std;
 
-class Patient
+struct Patient
 {
-public:
     string name;
     string middleName;
     string surname;
@@ -152,16 +151,16 @@ void savePatient(Patient *&patientArray, int &size)
     for (int i = 0; i < size; i++)
     {
         file << patientArray[i].name << ','
-        << patientArray[i].middleName << ','
-        << patientArray[i].surname << ','
-        << patientArray[i].motherMaidenName << ','
-        << patientArray[i].phoneNumber << ','
-        << patientArray[i].dayOfBirth << ','
-        << patientArray[i].monthOfBirth << ','
-        << patientArray[i].yearOfBirth << ','
-        << patientArray[i].cityOfBirth << ','
-        << patientArray[i].socialSecurityNumber << ','
-        << patientArray[i].insuranceNumber << ',';
+             << patientArray[i].middleName << ','
+             << patientArray[i].surname << ','
+             << patientArray[i].motherMaidenName << ','
+             << patientArray[i].phoneNumber << ','
+             << patientArray[i].dayOfBirth << ','
+             << patientArray[i].monthOfBirth << ','
+             << patientArray[i].yearOfBirth << ','
+             << patientArray[i].cityOfBirth << ','
+             << patientArray[i].socialSecurityNumber << ','
+             << patientArray[i].insuranceNumber << ',';
         for (int j = 0; j < 20; j++)
         {
             file << patientArray[i].medicalRecord[j] << ',';
