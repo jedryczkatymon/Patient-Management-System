@@ -8,6 +8,7 @@ using namespace std;
 int main()
 {
     Patient *patientArray = NULL;
+    loadPatientDataFromAFile(patientArray);
     int size = 0;
     int choice;
     do
@@ -21,10 +22,10 @@ int main()
         switch (choice)
         {
         case 1:
-            addPatient(patientArray, size);
+            addPatientData(patientArray, size);
             break;
         case 2:
-            deletePatient(patientArray, size);
+            deletePatientData(patientArray, size);
             break;
         default:
             cout << "Invalid code\n";
