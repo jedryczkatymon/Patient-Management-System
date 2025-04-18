@@ -3,10 +3,12 @@
 #include <string>
 #include "includes/patient.hpp"
 #include "includes/patientRecords.hpp"
+#include "includes/utils.hpp"
 using namespace std;
 
 int main()
 {
+    clearTerminal();
     Patient *patientArray = NULL;
     loadPatientDataFromAFile(patientArray);
     int size = 0;
@@ -14,21 +16,25 @@ int main()
     do
     {
         cout << "\nPatient Management System:\n";
-        cout << "1. Add patient\n";
-        cout << "2. Delete patient\n";
-        cout << "What do you want to do? (pick a number corresponding to a function): ";
+        cout << "1. Display patients\n";
+        cout << "2. Add patient\n";
+        cout << "3. Delete patient\n";
+        cout << "\nWhat do you want to do? (pick a number corresponding to a function): ";
         cin >> choice;
-
+        clearTerminal();
         switch (choice)
         {
         case 1:
-            addPatientData(patientArray, size);
+            displayPatientData(patientArray, size);
             break;
         case 2:
+            addPatientData(patientArray, size);
+            break;
+        case 3:
             deletePatientData(patientArray, size);
             break;
         default:
-            cout << "Invalid code\n";
+            cout << "\nInvalid code ❌\n";
         }
     } while (choice != 8);
 }

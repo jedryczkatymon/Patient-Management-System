@@ -7,6 +7,7 @@ struct Patient
     string name;
     string middleName;
     string surname;
+    string sex;
     string motherMaidenName;
     string phoneNumber;
     int dayOfBirth;
