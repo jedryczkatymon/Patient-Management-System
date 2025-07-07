@@ -1,0 +1,4 @@
+# Example patient data format:
+# first_name, middle_name, last_name, surname, sex, personal_id, birth_day, birth_month, birth_year, city, phone_number, emergency_contact, medical_conditions..., current_medications..., allergies...
+# Example:
+# Julia,null,Domino,Kowalska,female,987654321,15,6,1992,Cracow,234567890,876543210,m_fever,m_headache,c_ibuprom,c_amoxicillin,c_paracetamol,a_raspberries,a_blueberries,a_citrus,a_nuts,a_honey,a_eggs
