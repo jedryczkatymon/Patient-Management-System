@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
+#include <algorithm>
 #include "../includes/patientRecords.hpp"
 #include "../includes/patient.hpp"
 using namespace std;
@@ -161,7 +163,7 @@ void savePatientDataToAFile(Patient *&patientArray, int &size)
         return;
     }
 
-    fstream file("patientDataBase.csv", ios::out);
+    fstream file("patientDataBase.csv", ios::app | ios::out);
     if (!file)
     {
         cout << "\nCan't find the save file ❌\n";
@@ -202,25 +204,136 @@ void savePatientDataToAFile(Patient *&patientArray, int &size)
     file.close();
     cout << "\nThe patient data was saved successfully ✅\n";
 }
-void loadPatientDataFromAFile(Patient *&patientArray)
+void loadPatientDataFromAFile(Patient *&patientArray, int &size)
 {
-    /*
-    the program goes through every patient saved in a file and loads their data into an array
-    */
-    fstream file("patientDataBase.csv", ios::out);
-    if (!file)
+    string filePath = __FILE__;
+    filePath.replace(filePath.find("patientRecords.cpp"), sizeof("patientRecords.cpp"), "config.txt");
+    fstream config(filePath, ios::in);
+    if (!config)
     {
-        cout << "\nCan't find the load file ❌\n";
+        cout << "\nCan't find the config.txt ❌\n";
         return;
     }
-    string line;
-    getline(file, line, ',');
-    int size;
-    stringstream(line) >> size;
-    for (int i = 0; i < size; i++)
+    string csvPath;
+    getline(config, csvPath);
+    if (csvPath.empty())
     {
-        string line;
-        getline(file, line, ',');
+        cout << "\nconfig.txt is empty ❌\n";
+        config.close();
+        return;
     }
+    config.close();
+
+    fstream file(csvPath, ios::in);
+    if (!file)
+    {
+        cout << "\nCan't find the patientDataBase.csv file ❌\n";
+        return;
+    }
+    cout << "\nLoading patient data from the file...\n";
+    string line;
+    size = 0;
+    while (getline(file, line))
+    {
+        if (line.empty())
+            continue;
+        stringstream ss(line);
+        string field;
+        Patient patient;
+        int fieldIdx = 0;
+        int medRecIdx = 0, medIdx = 0, allergyIdx = 0;
+        while (getline(ss, field, ','))
+        {
+            if (field.empty())
+                continue;
+            if (field.rfind("m_", 0) == 0 && medRecIdx < 20)
+            {
+                patient.medicalRecord[medRecIdx++] = field.substr(2) + ", ";
+            }
+            else if (field.rfind("c_", 0) == 0 && medIdx < 20)
+            {
+                patient.currentMedications[medIdx++] = field.substr(2) + ", ";
+            }
+            else if (field.rfind("a_", 0) == 0 && allergyIdx < 20)
+            {
+                patient.allergies[allergyIdx++] = field.substr(2) + ", ";
+            }
+            else
+            {
+                switch (fieldIdx)
+                {
+                case 0:
+                    patient.name = field;
+                    break;
+                case 1:
+                    patient.middleName = field;
+                    break;
+                case 2:
+                    patient.surname = field;
+                    break;
+                case 3:
+                    patient.sex = field;
+                    break;
+                case 4:
+                    patient.motherMaidenName = field;
+                    break;
+                case 5:
+                    patient.phoneNumber = field;
+                    break;
+                case 6:
+                    try
+                    {
+                        patient.dayOfBirth = !field.empty() ? stoi(field) : 0;
+                    }
+                    catch (const std::invalid_argument &)
+                    {
+                        patient.dayOfBirth = 0;
+                    }
+                    break;
+                case 7:
+                    try
+                    {
+                        patient.monthOfBirth = !field.empty() ? stoi(field) : 0;
+                    }
+                    catch (const std::invalid_argument &)
+                    {
+                        patient.monthOfBirth = 0;
+                    }
+                    break;
+                case 8:
+                    try
+                    {
+                        patient.yearOfBirth = !field.empty() ? stoi(field) : 0;
+                    }
+                    catch (const std::invalid_argument &)
+                    {
+                        patient.yearOfBirth = 0;
+                    }
+                    break;
+                case 9:
+                    patient.cityOfBirth = field;
+                    break;
+                case 10:
+                    patient.socialSecurityNumber = field;
+                    break;
+                case 11:
+                    patient.insuranceNumber = field;
+                    break;
+                default:
+                    break;
+                }
+                fieldIdx++;
+            }
+        }
+
+        Patient *patientArrayTemp = new Patient[size + 1];
+        for (int i = 0; i < size; ++i)
+            patientArrayTemp[i] = patientArray[i];
+        patientArrayTemp[size] = patient;
+        delete[] patientArray;
+        patientArray = patientArrayTemp;
+        size++;
+    }
+    file.close();
     cout << "\nThe patient data was loaded successfully ✅\n";
 }

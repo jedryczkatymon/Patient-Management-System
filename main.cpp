@@ -10,8 +10,8 @@ int main()
 {
     clearTerminal();
     Patient *patientArray = NULL;
-    loadPatientDataFromAFile(patientArray);
     int size = 0;
+    loadPatientDataFromAFile(patientArray, size);
     int choice;
     do
     {
@@ -19,6 +19,7 @@ int main()
         cout << "1. Display patients\n";
         cout << "2. Add patient\n";
         cout << "3. Delete patient\n";
+        cout << "4. Exit\n";
         cout << "\nWhat do you want to do? (pick a number corresponding to a function): ";
         cin >> choice;
         clearTerminal();
@@ -33,6 +34,9 @@ int main()
         case 3:
             deletePatientData(patientArray, size);
             break;
+        case 4:
+            cout << "Exiting program...\n";
+            exit(0);
         default:
             cout << "\nInvalid code ❌\n";
         }
