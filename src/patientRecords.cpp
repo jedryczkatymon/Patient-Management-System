@@ -64,59 +64,62 @@ void addPatientData(Patient *&patientArray, int &size)
         cout << "Enter middle name: ";
         cin >> patientArrayTemp[i].middleName;
 
-        // cout << "Enter surname: ";
-        // cin >> patientArrayTemp[i].surname;
+        cout << "Enter surname: ";
+        cin >> patientArrayTemp[i].surname;
 
-        // cout << "Enter mother's maiden name: ";
-        // cin >> patientArrayTemp[i].motherMaidenName;
+        cout << "Enter mother's maiden name: ";
+        cin >> patientArrayTemp[i].motherMaidenName;
 
-        // cout << "Enter phone number: ";
-        // cin >> patientArrayTemp[i].phoneNumber;
+        cout << "Enter sex: ";
+        cin >> patientArrayTemp[i].sex;
 
-        // cout << "Enter day of birth: ";
-        // cin >> patientArrayTemp[i].dayOfBirth;
+        cout << "Enter phone number: ";
+        cin >> patientArrayTemp[i].phoneNumber;
 
-        // cout << "Enter month of birth: ";
-        // cin >> patientArrayTemp[i].monthOfBirth;
+        cout << "Enter day of birth: ";
+        cin >> patientArrayTemp[i].dayOfBirth;
 
-        // cout << "Enter year of birth: ";
-        // cin >> patientArrayTemp[i].yearOfBirth;
+        cout << "Enter month of birth: ";
+        cin >> patientArrayTemp[i].monthOfBirth;
 
-        // cout << "Enter city of birth: ";
-        // cin >> patientArrayTemp[i].cityOfBirth;
+        cout << "Enter year of birth: ";
+        cin >> patientArrayTemp[i].yearOfBirth;
 
-        // cout << "Enter social security number: ";
-        // cin >> patientArrayTemp[i].socialSecurityNumber;
+        cout << "Enter city of birth: ";
+        cin >> patientArrayTemp[i].cityOfBirth;
 
-        // cout << "Enter insurance number: ";
-        // cin >> patientArrayTemp[i].insuranceNumber;
+        cout << "Enter social security number: ";
+        cin >> patientArrayTemp[i].socialSecurityNumber;
 
-        // int numOfMedRecEntr = 0;
-        // cout << "How many medical record entries do you want to enter?: ";
-        // cin >> numOfMedRecEntr;
-        // for (int j = 0; j < numOfMedRecEntr; j++)
-        // {
-        //     cout << "Enter medical record entry [" << j + 1 << "]: ";
-        //     cin >> patientArrayTemp[i].medicalRecord[j];
-        // }
+        cout << "Enter insurance number: ";
+        cin >> patientArrayTemp[i].insuranceNumber;
 
-        // int numOfMedsEntr = 0;
-        // cout << "How many medication does the patient take?: ";
-        // cin >> numOfMedsEntr;
-        // for (int j = 0; j < numOfMedsEntr; j++)
-        // {
-        //     cout << "Enter current medication [" << j + 1 << "]: ";
-        //     cin >> patientArrayTemp[i].currentMedications[j];
-        // }
+        int numOfMedRecEntr = 0;
+        cout << "How many medical record entries do you want to enter?: ";
+        cin >> numOfMedRecEntr;
+        for (int j = 0; j < numOfMedRecEntr; j++)
+        {
+            cout << "Enter medical record entry [" << j + 1 << "]: ";
+            cin >> patientArrayTemp[i].medicalRecord[j];
+        }
 
-        // int numOfAllergyEntr = 0;
-        // cout << "How many allergies does the patient have?: ";
-        // cin >> numOfAllergyEntr;
-        // for (int j = 0; j < numOfAllergyEntr; j++)
-        // {
-        //     cout << "Enter allergy [" << j + 1 << "]: ";
-        //     cin >> patientArrayTemp[i].allergies[j];
-        // }
+        int numOfMedsEntr = 0;
+        cout << "How many medication does the patient take?: ";
+        cin >> numOfMedsEntr;
+        for (int j = 0; j < numOfMedsEntr; j++)
+        {
+            cout << "Enter current medication [" << j + 1 << "]: ";
+            cin >> patientArrayTemp[i].currentMedications[j];
+        }
+
+        int numOfAllergyEntr = 0;
+        cout << "How many allergies does the patient have?: ";
+        cin >> numOfAllergyEntr;
+        for (int j = 0; j < numOfAllergyEntr; j++)
+        {
+            cout << "Enter allergy [" << j + 1 << "]: ";
+            cin >> patientArrayTemp[i].allergies[j];
+        }
     }
     delete[] patientArray;
     patientArray = patientArrayTemp;
@@ -153,53 +156,68 @@ void deletePatientData(Patient *&patientArray, int &size)
 }
 void savePatientDataToAFile(Patient *&patientArray, int &size)
 {
-    /*
-    - the program goes through every patient in the patientArray and
-      for each saves their data to a file
-    */
-    if (patientArray == NULL || size == 0)
+    if (patientArray == nullptr || size == 0)
     {
         cout << "\nNo data to save ❌\n";
         return;
     }
 
-    fstream file("patientDataBase.csv", ios::app | ios::out);
+    string filePath = __FILE__;
+    filePath.replace(filePath.find("patientRecords.cpp"), sizeof("patientRecords.cpp"), "config.txt");
+    fstream config(filePath, ios::in);
+    if (!config)
+    {
+        cout << "\nCan't find the config.txt ❌\n";
+        return;
+    }
+    string csvPath;
+    getline(config, csvPath);
+    if (csvPath.empty())
+    {
+        cout << "\nconfig.txt is empty ❌\n";
+        config.close();
+        return;
+    }
+    config.close();
+
+    fstream file(csvPath, ios::out | ios::trunc);
     if (!file)
     {
-        cout << "\nCan't find the save file ❌\n";
+        cout << "\nCan't open the patientDataBase.csv file ❌\n";
         return;
     }
 
     for (int i = 0; i < size; i++)
     {
-        file << size << ','
-             << patientArray[i].name << ','
+        file << patientArray[i].name << ','
              << patientArray[i].middleName << ','
              << patientArray[i].surname << ','
              << patientArray[i].motherMaidenName << ','
+             << patientArray[i].sex << ','
              << patientArray[i].phoneNumber << ','
              << patientArray[i].dayOfBirth << ','
              << patientArray[i].monthOfBirth << ','
              << patientArray[i].yearOfBirth << ','
              << patientArray[i].cityOfBirth << ','
              << patientArray[i].socialSecurityNumber << ','
-             << patientArray[i].insuranceNumber << ','
-             << "medical record,";
+             << patientArray[i].insuranceNumber;
+
         for (int j = 0; j < 20; j++)
         {
-            file << patientArray[i].medicalRecord[j] << ',';
+            if (!patientArray[i].medicalRecord[j].empty())
+                file << ",m_" << patientArray[i].medicalRecord[j];
         }
-        file << "current medications,";
         for (int j = 0; j < 20; j++)
         {
-            file << patientArray[i].currentMedications[j] << ',';
+            if (!patientArray[i].currentMedications[j].empty())
+                file << ",c_" << patientArray[i].currentMedications[j];
         }
-        file << "allergies,";
         for (int j = 0; j < 20; j++)
         {
-            file << patientArray[i].allergies[j] << ',';
+            if (!patientArray[i].allergies[j].empty())
+                file << ",a_" << patientArray[i].allergies[j];
         }
-        file << "new patient\n";
+        file << '\n';
     }
     file.close();
     cout << "\nThe patient data was saved successfully ✅\n";
@@ -272,10 +290,10 @@ void loadPatientDataFromAFile(Patient *&patientArray, int &size)
                     patient.surname = field;
                     break;
                 case 3:
-                    patient.sex = field;
+                    patient.motherMaidenName = field;
                     break;
                 case 4:
-                    patient.motherMaidenName = field;
+                    patient.sex = field;
                     break;
                 case 5:
                     patient.phoneNumber = field;
