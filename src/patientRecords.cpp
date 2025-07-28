@@ -3,6 +3,7 @@
 #include <sstream>
 #include <filesystem>
 #include <algorithm>
+#include <vector>
 #include "../includes/patientRecords.hpp"
 #include "../includes/patient.hpp"
 using namespace std;
@@ -255,93 +256,48 @@ void loadPatientDataFromAFile(Patient *&patientArray, int &size)
     {
         if (line.empty())
             continue;
+
         stringstream ss(line);
         string field;
         Patient patient;
-        int fieldIdx = 0;
+
+        vector<string *> stringFields = {
+            &patient.name, &patient.middleName, &patient.surname, &patient.motherMaidenName,
+            &patient.sex, &patient.phoneNumber, nullptr, nullptr, nullptr,
+            &patient.cityOfBirth, &patient.socialSecurityNumber, &patient.insuranceNumber};
+
+        for (int i = 0; i < 12; ++i)
+        {
+            if (!getline(ss, field, ','))
+                break;
+
+            if (i == 6)
+            {
+                patient.dayOfBirth = field.empty() ? 0 : stoi(field);
+            }
+            else if (i == 7)
+            {
+                patient.monthOfBirth = field.empty() ? 0 : stoi(field);
+            }
+            else if (i == 8)
+            {
+                patient.yearOfBirth = field.empty() ? 0 : stoi(field);
+            }
+            else if (stringFields[i])
+            {
+                *stringFields[i] = field;
+            }
+        }
+
         int medRecIdx = 0, medIdx = 0, allergyIdx = 0;
         while (getline(ss, field, ','))
         {
-            if (field.empty())
-                continue;
             if (field.rfind("m_", 0) == 0 && medRecIdx < 20)
-            {
-                patient.medicalRecord[medRecIdx++] = field.substr(2) + ", ";
-            }
+                patient.medicalRecord[medRecIdx++] = field.substr(2);
             else if (field.rfind("c_", 0) == 0 && medIdx < 20)
-            {
-                patient.currentMedications[medIdx++] = field.substr(2) + ", ";
-            }
+                patient.currentMedications[medIdx++] = field.substr(2);
             else if (field.rfind("a_", 0) == 0 && allergyIdx < 20)
-            {
-                patient.allergies[allergyIdx++] = field.substr(2) + ", ";
-            }
-            else
-            {
-                switch (fieldIdx)
-                {
-                case 0:
-                    patient.name = field;
-                    break;
-                case 1:
-                    patient.middleName = field;
-                    break;
-                case 2:
-                    patient.surname = field;
-                    break;
-                case 3:
-                    patient.motherMaidenName = field;
-                    break;
-                case 4:
-                    patient.sex = field;
-                    break;
-                case 5:
-                    patient.phoneNumber = field;
-                    break;
-                case 6:
-                    try
-                    {
-                        patient.dayOfBirth = !field.empty() ? stoi(field) : 0;
-                    }
-                    catch (const std::invalid_argument &)
-                    {
-                        patient.dayOfBirth = 0;
-                    }
-                    break;
-                case 7:
-                    try
-                    {
-                        patient.monthOfBirth = !field.empty() ? stoi(field) : 0;
-                    }
-                    catch (const std::invalid_argument &)
-                    {
-                        patient.monthOfBirth = 0;
-                    }
-                    break;
-                case 8:
-                    try
-                    {
-                        patient.yearOfBirth = !field.empty() ? stoi(field) : 0;
-                    }
-                    catch (const std::invalid_argument &)
-                    {
-                        patient.yearOfBirth = 0;
-                    }
-                    break;
-                case 9:
-                    patient.cityOfBirth = field;
-                    break;
-                case 10:
-                    patient.socialSecurityNumber = field;
-                    break;
-                case 11:
-                    patient.insuranceNumber = field;
-                    break;
-                default:
-                    break;
-                }
-                fieldIdx++;
-            }
+                patient.allergies[allergyIdx++] = field.substr(2);
         }
 
         Patient *patientArrayTemp = new Patient[size + 1];
@@ -352,6 +308,7 @@ void loadPatientDataFromAFile(Patient *&patientArray, int &size)
         patientArray = patientArrayTemp;
         size++;
     }
+
     file.close();
     cout << "\nThe patient data was loaded successfully ✅\n";
 }
