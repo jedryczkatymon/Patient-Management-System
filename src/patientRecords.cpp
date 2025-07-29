@@ -5,8 +5,45 @@
 #include <algorithm>
 #include "../includes/patientRecords.hpp"
 #include "../includes/patient.hpp"
+#include "../includes/utils.hpp"
 using namespace std;
 
+void mainMenu()
+{
+    clearTerminal();
+    Patient *patientArray = NULL;
+    int size = 0;
+    loadPatientDataFromAFile(patientArray, size);
+    int choice;
+    do
+    {
+        cout << "\nPatient Management System:\n";
+        cout << "1. Display patients\n";
+        cout << "2. Add patient\n";
+        cout << "3. Delete patient\n";
+        cout << "4. Exit\n";
+        cout << "\nWhat do you want to do? (pick a number corresponding to a function): ";
+        cin >> choice;
+        clearTerminal();
+        switch (choice)
+        {
+        case 1:
+            displayPatientData(patientArray, size);
+            break;
+        case 2:
+            addPatientData(patientArray, size);
+            break;
+        case 3:
+            deletePatientData(patientArray, size);
+            break;
+        case 4:
+            cout << "Exiting program...\n";
+            exit(0);
+        default:
+            cout << "\nInvalid code ❌\n";
+        }
+    } while (choice != 8);
+}
 void displayPatientData(Patient *&patientArray, int &size)
 {
     if (size == 0)
@@ -16,7 +53,8 @@ void displayPatientData(Patient *&patientArray, int &size)
     }
     for (int i = 0; i < size; i++)
     {
-        cout << "\nName: " << patientArray[i].name << "\n"
+        cout << "\nIndex: " << i << "\n"
+             << "Name: " << patientArray[i].name << "\n"
              << "Middle name: " << patientArray[i].middleName << "\n"
              << "Surname: " << patientArray[i].surname << "\n"
              << "Sex: " << patientArray[i].sex << "\n"
@@ -27,7 +65,7 @@ void displayPatientData(Patient *&patientArray, int &size)
              << patientArray[i].monthOfBirth << "/"
              << patientArray[i].yearOfBirth << "\n"
              << "City of birth: " << patientArray[i].cityOfBirth << "\n"
-             << "Social security number: " << patientArray[i].socialSecurityNumber << "\n"
+             << "Social Security Number: " << patientArray[i].socialSecurityNumber << "\n"
              << "Insurance number: " << patientArray[i].insuranceNumber << "\n"
              << "Medical record: ";
         for (int j = 0; j < 20; j++)
@@ -88,7 +126,7 @@ void addPatientData(Patient *&patientArray, int &size)
         cout << "Enter city of birth: ";
         cin >> patientArrayTemp[i].cityOfBirth;
 
-        cout << "Enter social security number: ";
+        cout << "Enter Social Security Number: ";
         cin >> patientArrayTemp[i].socialSecurityNumber;
 
         cout << "Enter insurance number: ";
@@ -128,35 +166,93 @@ void addPatientData(Patient *&patientArray, int &size)
 }
 void deletePatientData(Patient *&patientArray, int &size)
 {
-    int index;
-    cout << "Enter the index of the patient you want to delete: ";
-    cin >> index;
-
-    if (index < 0 || index >= size)
+    if (size == 0 || patientArray == nullptr)
     {
-        cout << "\nInvalid index ❌\n";
+        cout << "\nNo patient data to delete ❌\n";
         return;
     }
 
-    for (int i = index; i < size - 1; ++i)
+    int choice;
+    do
     {
-        patientArray[i] = patientArray[i + 1];
-    }
+        cout << "\nDelete patient by:\n";
+        cout << "1. Index\n";
+        cout << "2. Social Security Number\n";
+        cout << "3. Back to main menu\n";
+        cout << "\nWhat do you want to do? (pick a number corresponding to a function): ";
+        cin >> choice;
+        clearTerminal();
 
-    Patient *patientArrayTemp = new Patient[size - 1];
-    for (int i = 0; i < size - 1; ++i)
-    {
-        patientArrayTemp[i] = patientArray[i];
-    }
-    delete[] patientArray;
-    patientArray = patientArrayTemp;
-    --size;
-    cout << "\nThe patient data was deleted successfully ✅\n";
-    savePatientDataToAFile(patientArray, size);
+        int delIndex = -1;
+
+        switch (choice)
+        {
+        case 1:
+        {
+            int index;
+            cout << "Enter the index of the patient you want to delete: ";
+            cin >> index;
+
+            if (index < 0 || index >= size)
+            {
+                cout << "\nInvalid index ❌\n";
+                break;
+            }
+            delIndex = index;
+            break;
+        }
+        case 2:
+        {
+            string ssn;
+            cout << "Enter the Social Security Number of the patient you want to delete: ";
+            cin >> ssn;
+
+            for (int i = 0; i < size; ++i)
+            {
+                if (patientArray[i].socialSecurityNumber == ssn)
+                {
+                    delIndex = i;
+                    break;
+                }
+            }
+            if (delIndex == -1)
+            {
+                cout << "\nPatient with given Social Security Number not found ❌\n";
+            }
+            break;
+        }
+        case 3:
+            return;
+        default:
+            cout << "\nInvalid code ❌\n";
+        }
+
+        if (delIndex != -1)
+        {
+            for (int i = delIndex; i < size - 1; ++i)
+            {
+                patientArray[i] = patientArray[i + 1];
+            }
+            Patient *patientArrayTemp = nullptr;
+            if (size - 1 > 0)
+            {
+                patientArrayTemp = new Patient[size - 1];
+                for (int i = 0; i < size - 1; ++i)
+                {
+                    patientArrayTemp[i] = patientArray[i];
+                }
+            }
+            delete[] patientArray;
+            patientArray = patientArrayTemp;
+            --size;
+            cout << "\nThe patient data was deleted successfully ✅\n";
+            savePatientDataToAFile(patientArray, size);
+        }
+    } while (choice != 3);
 }
 void savePatientDataToAFile(Patient *&patientArray, int &size)
 {
-    if (patientArray == nullptr || size == 0)
+    if (patientArray == nullptr && size > 0)
     {
         cout << "\nNo data to save ❌\n";
         return;
